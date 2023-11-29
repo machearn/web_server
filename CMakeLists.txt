@@ -35,6 +35,8 @@ add_executable(webserver_test
   ${CMAKE_SOURCE_DIR}/test/queue_test.cpp
   ${CMAKE_SOURCE_DIR}/data.cpp
   ${CMAKE_SOURCE_DIR}/test/data_test.cpp
+  ${CMAKE_SOURCE_DIR}/data_view.cpp
+  ${CMAKE_SOURCE_DIR}/test/data_view_test.cpp
 )
 target_link_libraries(webserver_test GTest::gtest_main)
 
