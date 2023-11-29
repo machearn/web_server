@@ -31,7 +31,11 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(webserver_test ${CMAKE_SOURCE_DIR}/test/queue_test.cpp)
+add_executable(webserver_test
+  ${CMAKE_SOURCE_DIR}/test/queue_test.cpp
+  ${CMAKE_SOURCE_DIR}/data.cpp
+  ${CMAKE_SOURCE_DIR}/test/data_test.cpp
+)
 target_link_libraries(webserver_test GTest::gtest_main)
 
 include(GoogleTest)
