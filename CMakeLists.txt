@@ -40,6 +40,8 @@ add_executable(webserver_test
   ${CMAKE_SOURCE_DIR}/test/data_buffer_test.cpp
   ${CMAKE_SOURCE_DIR}/utils.cpp
   ${CMAKE_SOURCE_DIR}/test/string_operation_test.cpp
+  ${CMAKE_SOURCE_DIR}/request_header.cpp
+  ${CMAKE_SOURCE_DIR}/test/request_header_test.cpp
 )
 target_link_libraries(webserver_test GTest::gtest_main)
 
