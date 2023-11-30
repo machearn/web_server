@@ -48,6 +48,5 @@ TEST_F(RequestHeaderTest, ToBytes) {
   web_server::message::RequestHeader header;
   std::string bytes{};
   EXPECT_TRUE(header.parse(data));
-  EXPECT_EQ(header.to_bytes(bytes), 0);
-  EXPECT_EQ(bytes.size(), header_str.size());
+  EXPECT_EQ(header.to_bytes(bytes), data.size());
 }

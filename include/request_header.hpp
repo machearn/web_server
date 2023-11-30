@@ -29,7 +29,7 @@ public:
   ~RequestHeader() = default;
 
   int parse(const DataView& data);
-  int to_bytes(std::string& bytes) const;
+  std::size_t to_bytes(std::string& bytes) const;
 
   const std::string& path() const {
     return _path;

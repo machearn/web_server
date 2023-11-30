@@ -26,7 +26,7 @@ int RequestHeader::parse(const DataView& data) {
   return start;
 }
 
-int RequestHeader::to_bytes(std::string& bytes) const {
+std::size_t RequestHeader::to_bytes(std::string& bytes) const {
   bytes += method_to_string();
   bytes += " ";
   bytes += _path;
@@ -43,7 +43,7 @@ int RequestHeader::to_bytes(std::string& bytes) const {
 
   bytes += "\r\n";
 
-  return 0;
+  return bytes.size();
 }
 
 void RequestHeader::parse_method(std::string_view method) {
