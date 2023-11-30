@@ -44,6 +44,8 @@ add_executable(webserver_test
   ${CMAKE_SOURCE_DIR}/test/request_header_test.cpp
   ${CMAKE_SOURCE_DIR}/request.cpp
   ${CMAKE_SOURCE_DIR}/test/request_test.cpp
+  ${CMAKE_SOURCE_DIR}/response_header.cpp
+  ${CMAKE_SOURCE_DIR}/test/response_header_test.cpp
 )
 target_link_libraries(webserver_test GTest::gtest_main)
 
