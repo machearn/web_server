@@ -18,5 +18,4 @@ public:
 } // namespace message
 } // namespace web_server
 
-
 #endif // DATA_BUFFER_H_

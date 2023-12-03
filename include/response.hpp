@@ -7,13 +7,13 @@
 #include <string>
 
 namespace web_server {
-namespace message{
+namespace message {
 
 class Response: public std::enable_shared_from_this<Response> {
 public:
   Response() = default;
   Response(const ResponseHeader& header, const std::string& body)
-    : _body(std::move(body)), _header(std::move(header)) {}
+      : _body(std::move(body)), _header(std::move(header)) {}
   Response(const DataView& data);
 
   ~Response() = default;

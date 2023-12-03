@@ -26,7 +26,7 @@ TEST(DataViewTest, SubData) {
   web_server::message::DataView data_view{data, 10, 0};
 
   auto sub1 = data_view.subdata(0, 5);
-  
+
   EXPECT_EQ(std::memcmp(sub1.data(), data_view.data(), 5), 0);
   EXPECT_EQ(sub1.size(), 5);
 

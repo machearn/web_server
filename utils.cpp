@@ -3,8 +3,7 @@
 namespace web_server {
 namespace utils {
 
-[[nodiscard]] int get_line(std::string_view data, std::string_view &line,
-                           int *start) {
+[[nodiscard]] int get_line(std::string_view data, std::string_view& line, int* start) {
   int i = *start;
   while (data[i] != '\r' && data[i + 1] != '\n') {
     ++i;
@@ -20,7 +19,7 @@ namespace utils {
   return 0;
 }
 
-void split_line(std::string_view line, std::vector<std::string_view> &words) {
+void split_line(std::string_view line, std::vector<std::string_view>& words) {
   int i = 0;
   while (line[i] != ' ') {
     ++i;
@@ -36,8 +35,7 @@ void split_line(std::string_view line, std::vector<std::string_view> &words) {
   words.emplace_back(line.data() + j + 1, line.size() - j - 1);
 }
 
-void split_head(std::string_view line, std::string_view &key,
-                std::string_view &value) {
+void split_head(std::string_view line, std::string_view& key, std::string_view& value) {
   int i = 0;
   while (line[i] != ':') {
     ++i;

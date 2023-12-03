@@ -4,18 +4,22 @@ namespace web_server {
 namespace message {
 
 Data::Data(std::size_t capacity)
-  : _allocator(), _data(_allocator.allocate(capacity)), _size(0), _capacity(capacity), _connection_id(0) {}
+    : _allocator(), _data(_allocator.allocate(capacity)), _size(0), _capacity(capacity),
+      _connection_id(0) {}
 
 Data::Data(std::size_t capacity, std::uint32_t connection_id)
-  : _allocator(), _data(_allocator.allocate(capacity)), _size(0), _capacity(capacity), _connection_id(connection_id) {}
+    : _allocator(), _data(_allocator.allocate(capacity)), _size(0), _capacity(capacity),
+      _connection_id(connection_id) {}
 
 Data::Data(const std::uint8_t* data, std::size_t size, std::uint32_t connection_id)
-  : _allocator(), _data(_allocator.allocate(size)), _size(size), _capacity(size), _connection_id(connection_id) {
+    : _allocator(), _data(_allocator.allocate(size)), _size(size), _capacity(size),
+      _connection_id(connection_id) {
   std::memcpy(_data, data, _size);
 }
 
 Data::Data(const Data& data)
-  : _allocator(), _data(_allocator.allocate(data._size)), _size(data._size), _connection_id(data._connection_id) {
+    : _allocator(), _data(_allocator.allocate(data._size)), _size(data._size),
+      _connection_id(data._connection_id) {
   std::memcpy(_data, data._data, _size);
 }
 
@@ -68,9 +72,7 @@ Data& Data::operator=(Data&& data) {
   return *this;
 }
 
-Data::~Data() {
-  clear();
-}
+Data::~Data() { clear(); }
 
 void Data::reserve(std::size_t capacity) {
   if (_data == nullptr) {
@@ -98,7 +100,7 @@ void Data::clear() {
   _capacity = 0;
 }
 
-void Data::append(const std::uint8_t *data, std::size_t size) {
+void Data::append(const std::uint8_t* data, std::size_t size) {
   if (_data == nullptr) {
     reserve(size);
   }
@@ -125,7 +127,6 @@ void Data::append(std::iostream& stream, std::size_t size) {
     _size += size;
   }
 }
-
 
 } // namespace message
 } // namespace web_server

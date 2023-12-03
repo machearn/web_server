@@ -34,7 +34,7 @@ std::size_t ResponseHeader::to_bytes(std::string& bytes) const {
   bytes += _status_message;
   bytes += "\r\n";
 
-  for (const auto& [key, value]: _headers) {
+  for (const auto& [key, value] : _headers) {
     bytes += key;
     bytes += ": ";
     bytes += value;

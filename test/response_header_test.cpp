@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-class ResponseHeaderTest : public ::testing::Test {
+class ResponseHeaderTest: public ::testing::Test {
 protected:
   void SetUp() override {
     std::string header_str = "HTTP/1.1 200 OK\r\n"

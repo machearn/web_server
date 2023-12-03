@@ -1,15 +1,14 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#include <queue>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <queue>
 
 namespace web_server {
 namespace utils {
 
-template <typename T>
-class Queue {
+template <typename T> class Queue {
 public:
   Queue() = default;
   Queue(const Queue<T>&) = delete;
@@ -42,7 +41,7 @@ public:
 
   T pop() {
     std::unique_lock<std::mutex> lock{_mutex};
-    _cv.wait(lock, [this](){return !_queue.empty();});
+    _cv.wait(lock, [this]() { return !_queue.empty(); });
     T value = std::move(_queue.front());
     _queue.pop();
     return value;

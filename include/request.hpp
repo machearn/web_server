@@ -7,13 +7,13 @@
 #include <string>
 
 namespace web_server {
-namespace message{
+namespace message {
 
 class Request: public std::enable_shared_from_this<Request> {
 public:
   Request() = default;
   Request(const RequestHeader& header, const std::string& body)
-    : _body(std::move(body)), _header(std::move(header)) {}
+      : _body(std::move(body)), _header(std::move(header)) {}
   Request(const DataView& data);
 
   ~Request() = default;
@@ -36,7 +36,5 @@ private:
 
 } // namespace message
 } // namespace web_server
-
-  
 
 #endif // REQUEST_H_

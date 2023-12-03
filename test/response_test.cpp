@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-class ResponseTest : public ::testing::Test {
+class ResponseTest: public ::testing::Test {
 protected:
   void SetUp() override {
     std::string response_str = "HTTP/1.1 200 OK\r\n"
@@ -10,7 +10,8 @@ protected:
                                "Content-Length: 13\r\n"
                                "\r\n"
                                "Hello, World!";
-    data = web_server::message::Data(reinterpret_cast<const std::uint8_t*>(response_str.data()), response_str.size(), 0);
+    data = web_server::message::Data(reinterpret_cast<const std::uint8_t*>(response_str.data()),
+                                     response_str.size(), 0);
   }
 
   web_server::message::Data data;

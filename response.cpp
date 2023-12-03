@@ -3,7 +3,6 @@
 namespace web_server {
 namespace message {
 
-
 Response::Response(const DataView& data) {
   int start = _header.parse(data);
   auto sub_data = data.subdata(start, std::string::npos);

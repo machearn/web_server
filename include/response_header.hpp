@@ -13,7 +13,7 @@ class ResponseHeader: public std::enable_shared_from_this<ResponseHeader> {
 public:
   ResponseHeader() = default;
   ResponseHeader(std::uint32_t status_code, const std::string& status_message)
-    : _status_code(status_code), _status_message(std::move(status_message)) {}
+      : _status_code(status_code), _status_message(std::move(status_message)) {}
 
   ~ResponseHeader() = default;
 

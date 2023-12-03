@@ -1,9 +1,9 @@
 #ifndef DATA_H_
 #define DATA_H_
 
-#include <memory>
 #include <cstring>
 #include <iostream>
+#include <memory>
 
 namespace web_server {
 namespace message {
@@ -30,7 +30,7 @@ public:
   void set_connection_id(std::uint32_t connection_id) { _connection_id = connection_id; }
 
   void reserve(std::size_t capacity);
-  void append(const std::uint8_t *data, std::size_t size);
+  void append(const std::uint8_t* data, std::size_t size);
   void append(std::iostream& stream, std::size_t size);
   void clear();
 

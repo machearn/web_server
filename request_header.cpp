@@ -34,7 +34,7 @@ std::size_t RequestHeader::to_bytes(std::string& bytes) const {
   bytes += _version;
   bytes += "\r\n";
 
-  for (const auto& [key, value]: _headers) {
+  for (const auto& [key, value] : _headers) {
     bytes += key;
     bytes += ": ";
     bytes += value;
@@ -70,39 +70,38 @@ void RequestHeader::parse_method(std::string_view method) {
   }
 }
 
-[[nodiscard]]
-std::string RequestHeader::method_to_string() const {
+[[nodiscard]] std::string RequestHeader::method_to_string() const {
   std::string ret;
   switch (_method) {
-    case Method::GET:
-      ret = "GET";
-      break;
-    case Method::POST:
-      ret = "POST";
-      break;
-    case Method::PUT:
-      ret = "PUT";
-      break;
-    case Method::DELETE:
-      ret = "DELETE";
-      break;
-    case Method::HEAD:
-      ret = "HEAD";
-      break;
-    case Method::OPTIONS:
-      ret = "OPTIONS";
-      break;
-    case Method::TRACE:
-      ret = "TRACE";
-      break;
-    case Method::CONNECT:
-      ret = "CONNECT";
-      break;
-    case Method::PATCH:
-      ret = "PATCH";
-      break;
-    default:
-      throw std::runtime_error("Unknown method");
+  case Method::GET:
+    ret = "GET";
+    break;
+  case Method::POST:
+    ret = "POST";
+    break;
+  case Method::PUT:
+    ret = "PUT";
+    break;
+  case Method::DELETE:
+    ret = "DELETE";
+    break;
+  case Method::HEAD:
+    ret = "HEAD";
+    break;
+  case Method::OPTIONS:
+    ret = "OPTIONS";
+    break;
+  case Method::TRACE:
+    ret = "TRACE";
+    break;
+  case Method::CONNECT:
+    ret = "CONNECT";
+    break;
+  case Method::PATCH:
+    ret = "PATCH";
+    break;
+  default:
+    throw std::runtime_error("Unknown method");
   }
 
   return ret;

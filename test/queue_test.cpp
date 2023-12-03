@@ -1,8 +1,8 @@
 #include "../include/queue.hpp"
 
 #include <gtest/gtest.h>
-#include <vector>
 #include <thread>
+#include <vector>
 
 class QueueTest: public testing::Test {
 protected:
@@ -109,4 +109,3 @@ TEST_F(QueueTest, TwoThreadsPushAndPop) {
 
   EXPECT_TRUE(queue.empty());
 }
-

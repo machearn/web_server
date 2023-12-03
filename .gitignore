@@ -1,4 +1,6 @@
+.DS_Store
 .cache/
 .vscode/
+.clang-format
 build/
 compile_commands.json

@@ -2,22 +2,16 @@
 
 #include <gtest/gtest.h>
 
-class DataTest : public testing::Test {
+class DataTest: public testing::Test {
 protected:
   web_server::message::Data data{};
 };
 
-TEST_F(DataTest, Capacity) {
-  EXPECT_EQ(data.capacity(), 0);
-}
+TEST_F(DataTest, Capacity) { EXPECT_EQ(data.capacity(), 0); }
 
-TEST_F(DataTest, Empty) {
-  EXPECT_EQ(data.size(), 0);
-}
+TEST_F(DataTest, Empty) { EXPECT_EQ(data.size(), 0); }
 
-TEST_F(DataTest, NullData) {
-  EXPECT_EQ(data.data(), nullptr);
-}
+TEST_F(DataTest, NullData) { EXPECT_EQ(data.data(), nullptr); }
 
 TEST_F(DataTest, SetGetConnectionId) {
   data.set_connection_id(123);
@@ -55,7 +49,6 @@ TEST_F(DataTest, Move) {
   EXPECT_EQ(data2.capacity(), 256);
   EXPECT_EQ(data2.size(), 5);
   EXPECT_EQ(std::memcmp(data2.data(), "Hello", 5), 0);
-
 
   web_server::message::Data data3{};
   data3 = std::move(data2);
