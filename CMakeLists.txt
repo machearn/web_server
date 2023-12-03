@@ -13,8 +13,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost REQUIRED COMPONENTS system)
 if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
 add_executable(webserver main.cpp)
@@ -48,8 +48,10 @@ add_executable(webserver_test
   ${CMAKE_SOURCE_DIR}/test/response_header_test.cpp
   ${CMAKE_SOURCE_DIR}/response.cpp
   ${CMAKE_SOURCE_DIR}/test/response_test.cpp
+  ${CMAKE_SOURCE_DIR}/test/mock_socket.cpp
+  ${CMAKE_SOURCE_DIR}/test/connection_test.cpp
 )
-target_link_libraries(webserver_test GTest::gtest_main)
+target_link_libraries(webserver_test GTest::gtest_main Boost::system)
 
 include(GoogleTest)
 gtest_discover_tests(webserver_test)
