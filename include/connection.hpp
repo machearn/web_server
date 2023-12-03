@@ -17,7 +17,8 @@ namespace connection {
 template <typename T>
 concept Socket = std::is_base_of<boost::asio::ip::tcp::socket, T>::value;
 
-template <Socket T> class Connection: public std::enable_shared_from_this<Connection<T>> {
+template <Socket T>
+class Connection: public std::enable_shared_from_this<Connection<T>> {
 public:
   Connection() = delete;
   Connection(boost::asio::io_context& io_context, T socket, utils::Queue<message::Data>& in_queue)
@@ -44,10 +45,9 @@ public:
 
   void send(const message::Data& data);
   void receive(std::uint32_t connection_id);
-
-private:
   boost::system::error_code finish();
 
+private:
   void commit(const message::Data& data);
 
   boost::system::error_code handle_message(std::uint32_t connection_id,
@@ -70,7 +70,8 @@ private:
 namespace web_server {
 namespace connection {
 
-template <Socket T> void Connection<T>::send(const message::Data& data) {
+template <Socket T>
+void Connection<T>::send(const message::Data& data) {
   boost::asio::async_write(
       _socket, boost::asio::buffer(reinterpret_cast<const void*>(data.data()), data.size()),
       [](boost::system::error_code ec, std::size_t bytes_transfered) {
@@ -82,7 +83,8 @@ template <Socket T> void Connection<T>::send(const message::Data& data) {
       });
 }
 
-template <Socket T> void Connection<T>::receive(std::uint32_t connection_id) {
+template <Socket T>
+void Connection<T>::receive(std::uint32_t connection_id) {
   try {
     boost::asio::async_read_until(_socket, _buffer, "\r\n\r\n",
                                   std::bind(&Connection::handle_message, get_shared_ptr(),
@@ -95,7 +97,8 @@ template <Socket T> void Connection<T>::receive(std::uint32_t connection_id) {
   }
 }
 
-template <Socket T> boost::system::error_code Connection<T>::finish() {
+template <Socket T>
+boost::system::error_code Connection<T>::finish() {
   boost::system::error_code ec;
   _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   _socket.close(ec);
@@ -103,7 +106,8 @@ template <Socket T> boost::system::error_code Connection<T>::finish() {
   return ec;
 }
 
-template <Socket T> void Connection<T>::commit(const message::Data& data) {
+template <Socket T>
+void Connection<T>::commit(const message::Data& data) {
   _in_queue.push(std::move(data));
 }
 

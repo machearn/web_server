@@ -50,6 +50,7 @@ add_executable(webserver_test
   ${CMAKE_SOURCE_DIR}/test/response_test.cpp
   ${CMAKE_SOURCE_DIR}/test/mock_socket.cpp
   ${CMAKE_SOURCE_DIR}/test/connection_test.cpp
+  ${CMAKE_SOURCE_DIR}/test/connection_pool_test.cpp
 )
 target_link_libraries(webserver_test GTest::gtest_main Boost::system)
 
