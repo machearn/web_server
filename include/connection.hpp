@@ -23,7 +23,7 @@ public:
   Connection() = delete;
   Connection(boost::asio::io_context& io_context, T socket, utils::Queue<message::Data>& in_queue)
       : _socket(std::move(socket)), _io_context(io_context), _buffer(),
-        _last_request_time(std::chrono::system_clock::now()), _in_queue(in_queue) {}
+        _last_active_time(std::chrono::system_clock::now()), _in_queue(in_queue) {}
 
   ~Connection() {
     auto ec = finish();
@@ -38,7 +38,7 @@ public:
   const T& socket() const { return _socket; }
   bool is_connected() const { return _socket.is_open(); }
   bool is_timed_out() const {
-    return std::chrono::system_clock::now() - _last_request_time > std::chrono::minutes(5);
+    return std::chrono::system_clock::now() - _last_active_time > std::chrono::minutes(5);
   }
 
   bool closable() const { return is_timed_out() || !is_connected(); }
@@ -50,15 +50,16 @@ public:
 private:
   void commit(const message::Data& data);
 
-  boost::system::error_code handle_message(std::uint32_t connection_id,
-                                           boost::system::error_code ec,
-                                           std::size_t bytes_transferred);
+  boost::system::error_code handle_write(boost::system::error_code ec,
+                                         std::size_t bytes_transfered);
+  boost::system::error_code handle_read(std::uint32_t connection_id, boost::system::error_code ec,
+                                        std::size_t bytes_transferred);
 
   T _socket;
   boost::asio::io_context& _io_context;
   boost::asio::streambuf _buffer;
 
-  std::chrono::time_point<std::chrono::system_clock> _last_request_time;
+  std::chrono::time_point<std::chrono::system_clock> _last_active_time;
 
   utils::Queue<message::Data>& _in_queue;
 };
@@ -74,25 +75,20 @@ template <Socket T>
 void Connection<T>::send(const message::Data& data) {
   boost::asio::async_write(
       _socket, boost::asio::buffer(reinterpret_cast<const void*>(data.data()), data.size()),
-      [](boost::system::error_code ec, std::size_t bytes_transfered) {
-        if (!ec) {
-          std::cout << "Write " << bytes_transfered << " bytes!" << std::endl;
-        } else {
-          std::cerr << "Write Error: " << ec.message() << std::endl;
-        }
-      });
+      std::bind(&Connection::handle_write, get_shared_ptr(), std::placeholders::_1,
+                std::placeholders::_2));
 }
 
 template <Socket T>
 void Connection<T>::receive(std::uint32_t connection_id) {
   try {
     boost::asio::async_read_until(_socket, _buffer, "\r\n\r\n",
-                                  std::bind(&Connection::handle_message, get_shared_ptr(),
+                                  std::bind(&Connection::handle_read, get_shared_ptr(),
                                             connection_id, std::placeholders::_1,
                                             std::placeholders::_2));
   } catch (const std::bad_weak_ptr& e) {
     boost::asio::async_read_until(_socket, _buffer, "\r\n\r\n",
-                                  std::bind(&Connection::handle_message, this, connection_id,
+                                  std::bind(&Connection::handle_read, this, connection_id,
                                             std::placeholders::_1, std::placeholders::_2));
   }
 }
@@ -112,9 +108,9 @@ void Connection<T>::commit(const message::Data& data) {
 }
 
 template <Socket T>
-boost::system::error_code Connection<T>::handle_message(std::uint32_t connection_id,
-                                                        boost::system::error_code ec,
-                                                        std::size_t bytes_transferred) {
+boost::system::error_code Connection<T>::handle_read(std::uint32_t connection_id,
+                                                     boost::system::error_code ec,
+                                                     std::size_t bytes_transferred) {
   if (!ec) {
     message::Data data{};
     data.set_connection_id(connection_id);
@@ -136,7 +132,7 @@ boost::system::error_code Connection<T>::handle_message(std::uint32_t connection
     data.append((std::uint8_t*)_buffer.data().data(), length);
     commit(data);
     _buffer.consume(length);
-    _last_request_time = std::chrono::system_clock::now();
+    _last_active_time = std::chrono::system_clock::now();
 
     receive(connection_id);
   } else {
@@ -150,6 +146,18 @@ boost::system::error_code Connection<T>::handle_message(std::uint32_t connection
       std::cerr << "Read Error: " << ec.message() << std::endl;
   }
 
+  return ec;
+}
+
+template <Socket T>
+boost::system::error_code Connection<T>::handle_write(boost::system::error_code ec,
+                                                      std::size_t bytes_transfered) {
+  _last_active_time = std::chrono::system_clock::now();
+  if (!ec) {
+    std::cout << "Write " << bytes_transfered << " bytes!" << std::endl;
+  } else {
+    std::cerr << "Write Error: " << ec.message() << std::endl;
+  }
   return ec;
 }
 
