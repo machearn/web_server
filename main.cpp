@@ -10,7 +10,7 @@ void sigint_handler(int s) {
   sig = s;
 }
 
-int main() {
+int main(int argc, char** argv) {
   struct sigaction sigint_action;
   sigint_action.sa_handler = sigint_handler;
   sigemptyset(&sigint_action.sa_mask);
@@ -19,7 +19,12 @@ int main() {
   sigaction(SIGINT, &sigint_action, nullptr);
 
   using namespace web_server;
-  std::filesystem::path root_dir{"/Users/machearn/var/www/"};
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0] << " <root directory>" << std::endl;
+    exit(1);
+  }
+  std::filesystem::path root_dir{argv[1]};
+  utils::Logger::logger().info("main::Root directory: " + root_dir.string());
   StaticServer server{8080, root_dir};
   server.start();
   for (;;) {
