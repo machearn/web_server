@@ -128,5 +128,10 @@ void Data::append(std::iostream& stream, std::size_t size) {
   }
 }
 
+std::string Data::to_string() const {
+  std::string str{reinterpret_cast<const char*>(_data), _size};
+  return str;
+}
+
 } // namespace message
 } // namespace web_server

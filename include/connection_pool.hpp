@@ -2,9 +2,11 @@
 #define CONNECTION_POOL_H_
 
 #include "connection.hpp"
+#include "logger.hpp"
 
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 namespace web_server {
@@ -40,6 +42,7 @@ public:
     }
     return _connections[id];
   }
+
   ConnectionPtr<T> get_connection(std::int32_t id) {
     if (id >= _max_connections) {
       return nullptr;
@@ -90,12 +93,16 @@ ConnectionPool<T>::ConnectionPool(std::uint32_t max_connections)
 template <Socket T>
 std::int32_t ConnectionPool<T>::add(const ConnectionPtr<T> connection) {
   if (_available_ids.empty() && erase_unavaliable() == 0) {
+    utils::Logger::logger().warning("ConnectionPool Full");
     return -1;
   }
 
   auto id = *_available_ids.begin();
   _available_ids.erase(id);
   _connections[id] = connection;
+#ifdef DEBUG
+  utils::Logger::logger().debug("ConnectionPool add Connection: " + std::to_string(id));
+#endif
   return id;
 }
 
@@ -103,12 +110,16 @@ template <Socket T>
 std::int32_t ConnectionPool<T>::emplace(boost::asio::io_context& io_context, T socket,
                                         utils::Queue<message::Data>& in_queue) {
   if (_available_ids.empty() && erase_unavaliable() == 0) {
+    utils::Logger::logger().warning("ConnectionPool Full");
     return -1;
   }
 
   auto id = *_available_ids.begin();
   _available_ids.erase(id);
   _connections[id] = std::make_shared<Connection<T>>(io_context, std::move(socket), in_queue);
+#ifdef DEBUG
+  utils::Logger::logger().debug("ConnectionPool add Connection: " + std::to_string(id));
+#endif
   return id;
 }
 

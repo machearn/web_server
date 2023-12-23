@@ -3,6 +3,7 @@
 
 #include "data.hpp"
 #include "data_buffer.hpp"
+#include "logger.hpp"
 #include "queue.hpp"
 #include "utils.hpp"
 
@@ -10,6 +11,7 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace web_server {
 namespace connection {
@@ -28,7 +30,7 @@ public:
   ~Connection() {
     auto ec = finish();
     if (ec) {
-      std::cerr << "Finish Error: " << ec.message() << std::endl;
+      utils::Logger::logger().error("Connection Finish Error: " + ec.message());
       std::exit(1);
     }
   }
@@ -73,14 +75,26 @@ namespace connection {
 
 template <Socket T>
 void Connection<T>::send(const message::Data& data) {
-  boost::asio::async_write(
-      _socket, boost::asio::buffer(reinterpret_cast<const void*>(data.data()), data.size()),
-      std::bind(&Connection::handle_write, get_shared_ptr(), std::placeholders::_1,
-                std::placeholders::_2));
+  utils::Logger::logger().info("Connection send data");
+#ifdef DEBUG
+  utils::Logger::logger().debug("Connection send data: " + data.to_string());
+  utils::Logger::logger().debug("Connection send data size: " + std::to_string(data.size()));
+#endif
+  try {
+    boost::asio::async_write(
+        _socket, boost::asio::buffer(reinterpret_cast<const void*>(data.data()), data.size()),
+        std::bind(&Connection::handle_write, get_shared_ptr(), std::placeholders::_1,
+                  std::placeholders::_2));
+  } catch (const std::bad_weak_ptr& e) {
+    boost::asio::async_write(
+        _socket, boost::asio::buffer(reinterpret_cast<const void*>(data.data()), data.size()),
+        std::bind(&Connection::handle_write, this, std::placeholders::_1, std::placeholders::_2));
+  }
 }
 
 template <Socket T>
 void Connection<T>::receive(std::uint32_t connection_id) {
+  utils::Logger::logger().info("Connection " + std::to_string(connection_id) + " receive data ");
   try {
     boost::asio::async_read_until(_socket, _buffer, "\r\n\r\n",
                                   std::bind(&Connection::handle_read, get_shared_ptr(),
@@ -99,6 +113,7 @@ boost::system::error_code Connection<T>::finish() {
   _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   _socket.close(ec);
   _buffer.consume(_buffer.size());
+  utils::Logger::logger().info("Connection Closed");
   return ec;
 }
 
@@ -121,29 +136,43 @@ boost::system::error_code Connection<T>::handle_read(std::uint32_t connection_id
     std::string line{};
     std::uint32_t length = bytes_transferred;
     while (std::getline(is, line) && line != "\r") {
+#ifdef DEBUG
+      utils::Logger::logger().debug("Connection read line: " + line);
+#endif
       if (line.find("Content-Length") != std::string::npos) {
         std::string_view key, value;
         utils::split_head(line, key, value);
         length += std::stoi(std::string(value));
+#ifdef DEBUG
+        utils::Logger::logger().debug("Connection Read Content-Length: " + std::string(value));
+        utils::Logger::logger().debug("Connection Total Length: " + std::to_string(length));
+#endif
         break;
       }
     }
 
     data.append((std::uint8_t*)_buffer.data().data(), length);
+#ifdef DEBUG
+    utils::Logger::logger().debug(
+        "Connection Read: " + std::string{reinterpret_cast<const char*>(data.data()), data.size()});
+#endif
     commit(data);
     _buffer.consume(length);
     _last_active_time = std::chrono::system_clock::now();
+    utils::Logger::logger().info("Connection Read " + std::to_string(length) + " bytes");
 
     receive(connection_id);
   } else {
     if (ec == boost::asio::error::eof) {
+      utils::Logger::logger().warning("Connection End of File, trying to close");
       auto finish_ec = finish();
       if (finish_ec) {
-        std::cerr << "Finish Error: " << finish_ec.message() << std::endl;
+        utils::Logger::logger().error("Connection Finish Error: " + finish_ec.message());
         std::exit(1);
       }
-    } else
-      std::cerr << "Read Error: " << ec.message() << std::endl;
+    } else {
+      utils::Logger::logger().error("Connection Read Error: " + ec.message());
+    }
   }
 
   return ec;
@@ -154,9 +183,9 @@ boost::system::error_code Connection<T>::handle_write(boost::system::error_code 
                                                       std::size_t bytes_transfered) {
   _last_active_time = std::chrono::system_clock::now();
   if (!ec) {
-    std::cout << "Write " << bytes_transfered << " bytes!" << std::endl;
+    utils::Logger::logger().info("Connection Write " + std::to_string(bytes_transfered) + " bytes");
   } else {
-    std::cerr << "Write Error: " << ec.message() << std::endl;
+    utils::Logger::logger().error("Connection Write Error: " + ec.message());
   }
   return ec;
 }

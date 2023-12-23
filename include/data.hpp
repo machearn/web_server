@@ -34,6 +34,8 @@ public:
   void append(std::iostream& stream, std::size_t size);
   void clear();
 
+  std::string to_string() const;
+
 private:
   std::allocator<std::uint8_t> _allocator;
 

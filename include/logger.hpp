@@ -8,7 +8,7 @@
 namespace web_server {
 namespace utils {
 
-enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
+enum class LogLevel { debug, info, warning, error, critical };
 
 class Logger {
 public:
@@ -27,29 +27,29 @@ public:
     std::lock_guard<std::mutex> lock(_mutex);
     _out << get_time_string() << " ";
     switch (level) {
-    case LogLevel::DEBUG:
+    case LogLevel::debug:
       _out << "[DEBUG]: " << message << std::endl;
       break;
-    case LogLevel::INFO:
+    case LogLevel::info:
       _out << "[INFO]: " << message << std::endl;
       break;
-    case LogLevel::WARNING:
+    case LogLevel::warning:
       _out << "[WARNING]: " << message << std::endl;
       break;
-    case LogLevel::ERROR:
+    case LogLevel::error:
       _out << "[ERROR]: " << message << std::endl;
       break;
-    case LogLevel::CRITICAL:
+    case LogLevel::critical:
       _out << "[CRITICAL]: " << message << std::endl;
       break;
     }
   }
 
-  void debug(const std::string& message) { log(LogLevel::DEBUG, message); }
-  void info(const std::string& message) { log(LogLevel::INFO, message); }
-  void warning(const std::string& message) { log(LogLevel::WARNING, message); }
-  void error(const std::string& message) { log(LogLevel::ERROR, message); }
-  void critical(const std::string& message) { log(LogLevel::CRITICAL, message); }
+  void debug(const std::string& message) { log(LogLevel::debug, message); }
+  void info(const std::string& message) { log(LogLevel::info, message); }
+  void warning(const std::string& message) { log(LogLevel::warning, message); }
+  void error(const std::string& message) { log(LogLevel::error, message); }
+  void critical(const std::string& message) { log(LogLevel::critical, message); }
 
 private:
   Logger(std::ostream& out): _out(out) {}

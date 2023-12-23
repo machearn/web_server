@@ -11,13 +11,30 @@ set(Boost_USE_RELEASE_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
+option(USE_DEBUG "Use debug mode" OFF)
+
+if(USE_DEBUG)
+  set(CMAKE_BUILD_TYPE Debug)
+  add_compile_definitions(DEBUG)
+endif()
+
 find_package(Boost REQUIRED COMPONENTS system)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
-add_executable(webserver main.cpp)
+add_executable(webserver
+  ${CMAKE_SOURCE_DIR}/main.cpp
+  ${CMAKE_SOURCE_DIR}/data.cpp
+  ${CMAKE_SOURCE_DIR}/data_view.cpp
+  ${CMAKE_SOURCE_DIR}/utils.cpp
+  ${CMAKE_SOURCE_DIR}/request_header.cpp
+  ${CMAKE_SOURCE_DIR}/request.cpp
+  ${CMAKE_SOURCE_DIR}/response_header.cpp
+  ${CMAKE_SOURCE_DIR}/response.cpp
+  ${CMAKE_SOURCE_DIR}/static_server.cpp
+)
 target_link_libraries(webserver Boost::system)
 
 include(FetchContent)

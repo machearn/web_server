@@ -8,7 +8,8 @@
 namespace web_server {
 namespace utils {
 
-template <typename T> class Queue {
+template <typename T>
+class Queue {
 public:
   Queue() = default;
   Queue(const Queue<T>&) = delete;
