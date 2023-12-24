@@ -40,6 +40,17 @@ public:
     _cv.notify_one();
   }
 
+  int pop(T& value) {
+    std::unique_lock<std::mutex> lock{_mutex};
+    _cv.wait_for(lock, std::chrono::seconds(1), [this]() { return !_queue.empty(); });
+    if (_queue.empty()) {
+      return -1;
+    }
+    value = std::move(_queue.front());
+    _queue.pop();
+    return 0;
+  }
+
   T pop() {
     std::unique_lock<std::mutex> lock{_mutex};
     _cv.wait(lock, [this]() { return !_queue.empty(); });

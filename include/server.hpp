@@ -180,8 +180,18 @@ template <typename T>
 std::uint32_t Server<T>::fetch_data(std::uint32_t max_count) {
   std::uint32_t count = 0;
   while (count < max_count && !_in_queue.empty()) {
-    message::Data data = _in_queue.pop();
-    auto ret = _receive_thread_pool.submit([this, data]() {
+#ifdef DEBUG
+    utils::Logger::logger().debug("Server::Registed fetch");
+#endif
+    auto ret = _receive_thread_pool.submit([this]() {
+      message::Data data{};
+      int ret = _in_queue.pop(data);
+      if (ret == -1) {
+#ifdef DEBUG
+        utils::Logger::logger().debug("Server::InQueue is empty.");
+#endif
+        return;
+      }
 #ifdef DEBUG
       utils::Logger::logger().debug("Server::Fetched data: " + data.to_string());
       utils::Logger::logger().debug("Server::InQueue remain: " + std::to_string(_in_queue.size()));
@@ -191,9 +201,6 @@ std::uint32_t Server<T>::fetch_data(std::uint32_t max_count) {
     });
     ++count;
   }
-  if (count > 0) {
-    utils::Logger::logger().info("Server::Fetched " + std::to_string(count) + " data.");
-  }
   return count;
 }
 
@@ -201,8 +208,18 @@ template <typename T>
 std::uint32_t Server<T>::deliver_data(std::uint32_t max_count) {
   std::uint32_t count = 0;
   while (count < max_count && !_out_queue.empty()) {
-    message::Data data = _out_queue.pop();
-    auto ret = _send_thread_pool.submit([this, data]() {
+#ifdef DEBUG
+    utils::Logger::logger().debug("Server::Registed deliver");
+#endif
+    auto ret = _send_thread_pool.submit([this]() {
+      message::Data data{};
+      int ret = _out_queue.pop(data);
+      if (ret == -1) {
+#ifdef DEBUG
+        utils::Logger::logger().debug("Server::OutQueue is empty.");
+#endif
+        return;
+      }
 #ifdef DEBUG
       utils::Logger::logger().debug("Server::Delivering data: " + data.to_string());
       utils::Logger::logger().debug("Server::OutQueue remain: " +
@@ -211,9 +228,6 @@ std::uint32_t Server<T>::deliver_data(std::uint32_t max_count) {
       handle_send(data.connection_id(), data);
     });
     ++count;
-  }
-  if (count > 0) {
-    utils::Logger::logger().info("Server::Delivered " + std::to_string(count) + " data.");
   }
   return count;
 }
